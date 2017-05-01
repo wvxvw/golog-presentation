@@ -1,0 +1,239 @@
+% Created 2017-05-01 Mon 18:23
+\documentclass[presentation]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\tolerance=1000
+\usepackage[utf8]{inputenc}
+\usetheme{metropolis}
+\author{Oleg Sivokon}
+\date{\textit{<2017-05-01 Mon>}}
+\title{Using Golog (Prolog interpretator in Go)}
+\hypersetup{
+  pdfkeywords={go golang prolog golog interpretator},
+  pdfsubject={Overview and Prolog interpretator for Go},
+  pdfcreator={Emacs 25.2.1 (Org mode 8.2.10)}}
+\begin{document}
+
+\maketitle
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+
+
+\section{But Why?}
+\label{sec-1}
+\includegraphics[height=8cm]{./images/butwhy.jpeg}
+
+\begin{frame}[label=sec-1-1]{Serialization}
+\begin{quote}
+This comes up when you're doing generic programming, where you
+want to write functions that will take data of any type and just
+walk over it and serialize it, say.  So that's a time when types
+can be a bit awkward and an untyped language is particularly
+straightforward.  It couldn't be easier to write a serializer in
+an untyped language.
+\end{quote}
+Simon Peyton Jones, GHC author, Microsoft Research.
+\end{frame}
+
+\begin{frame}[label=sec-1-2]{Parsing}
+\begin{quote}
+Prolog was originally invented as a programming language in which
+to write natural language applications, and thus Prolog is a very
+elegant language for expressing grammars.  Prolog even has a
+builtin syntax especially created for writing grammars.  It is
+often said that with Prolog one gets a builtin parser for free.
+\end{quote}
+Prof. David S. Warren, University of New York
+\end{frame}
+
+\begin{frame}[label=sec-1-3]{Homoiconicity}
+\begin{quote}
+The ability to represent the code in the language by other code in
+that language makes that language deserve the status of
+homo-iconic.  Since version 3.0 C\# was homoiconic for the
+expression subset of the language, thanks to the introduction of
+expression trees.  As you can see, the expression trees are a very
+powerful concept to inspect code at runtime which goes much beyond
+their use in LINQ.  You can think of them as ``reflection on
+steroids'', and their importance will only increase in the
+releases to come.
+\end{quote}
+Bart De Smet, C\# 5.0.
+\end{frame}
+
+\begin{frame}[label=sec-1-4]{Larger problem: dealing with the unknown}
+\end{frame}
+
+\begin{frame}[label=sec-1-5]{Some practical uses}
+\begin{itemize}
+\item Knowledge bases
+\item Interactive shells
+\item Rich data exchange and configuration format
+\item Testing
+\end{itemize}
+\end{frame}
+
+\section{Water, From The Toilet?}
+\label{sec-2}
+\includegraphics[height=8cm]{./images/water-from-toilet.jpg}
+
+\begin{frame}[label=sec-2-1]{Various models of computation, unknown to general public}
+\begin{itemize}
+\item Petri nets a.k.a. Turing machine
+\item ``Value semantics'', a.k.a. ``functional programming''
+a.k.a. ``declarative programming''
+\item Unification
+\item Graph rewriting
+\item Cellular automata
+\item Biological modes? Perhaps much, much more\ldots{}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label=sec-2-2]{Programming taught using one model}
+\begin{itemize}
+\item Model intuitively accepted as the only possible one
+\item Students don't develop more abstract understanding of computation
+\item Some problems lend themselvs better to particular computation
+model
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile,label=sec-2-3]{Unification}
+ \begin{verbatim}
+%% Two uninstantiated variables unify
+X = Y,
+%% Unification works on sub-terms
+%% X = 1
+[X | Xs] = [1 | Xs],
+%% Unification can be arbitrary deep
+%% and unify multiple variables
+%% X = 1, Y = 2, Z = baz(3)
+foo([bar(X, Y), Z]) = foo([bar(1, 2), baz(3)]),
+%% Unification can be recursive
+%% X = rec(rec(rec(...)))
+X = rec(X)
+\end{verbatim}
+\end{frame}
+
+\section{Seriously, Now}
+\label{sec-3}
+\includegraphics[height=6cm]{./images/serious.jpg}
+
+\begin{frame}[label=sec-3-1]{Obtaining the code}
+\begin{itemize}
+\item Official version: git@github.com:mndrix/golog.git
+\item My fork: git@github.com:wvxvw/golog.git
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile,label=sec-3-2]{Minimal setup}
+ \begin{verbatim}
+m := golog.NewInteractiveMachine()
+m = m.Consult(`
+    father(john).
+    father(jacob).
+    mother(sue).
+    parent(X) :- father(X).
+    parent(X) :- mother(X).
+`)
+solutions := m.ProveAll(`parent(X).`)
+for _, s := range solutions {
+    fmt.Printf("%s is a parent\n", s.ByName_("X"))
+}
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[label=sec-3-3]{golog.Machine}
+\begin{itemize}
+\item Main interface to interpreter
+\item Immutable \emph{(safe for concurrent access)}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile,label=sec-3-4]{(*golog.Machine).Consult(interface\{\}) *golog.Machine}
+ \begin{itemize}
+\item \texttt{consult/1} loads code in ISO Prolog
+\item Creates database
+\item Similar to \texttt{insert} in SQL
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile,label=sec-3-5]{(*golog.Machine).ProveAll(interface\{\}) []golog.Bindings}
+ \begin{itemize}
+\item Generates \alert{ALL} solutions
+\item Similar to \texttt{select} in SQL
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile,label=sec-3-6]{Exposing foreign (native) objects}
+ \begin{verbatim}
+func HelloWorld(
+    m golog.Machine, args []term.Term,
+) golog.ForeignReturn {
+    return golog.ForeignUnify(
+        term.NewAtom("Hello World"), args[0],
+    )
+}
+func NewHelloWorldMachine() golog.Machine {
+    return golog.NewMachine().RegisterForeign(
+        map[string]golog.ForeignPredicate{
+            "hello_world/1": HelloWorld,
+        },
+    )
+}
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile,label=sec-3-7]{Using foreign objects}
+ \begin{verbatim}
+m := golog.NewHelloWorldMachine()
+solutions := m.ProveAll(`hello_world(X).`)
+for _, s := range solutions {
+    fmt.Printf("%s\n", s.ByName_("X")) // Hello World
+}
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile,label=sec-3-8]{Marshalling Go structs (experimental)}
+ \begin{itemize}
+\item \texttt{native.Decoder} decodes Prolog callable terms into Go structs
+\item \texttt{native.Encoder} encodes Go structs as Prolog terms
+\item \texttt{native.GenerateMethods()} generates methods specializing on
+given struct
+\item \texttt{native.GenerateAccessors()} generates special Prolog predicates
+for accessing fields in Go structs
+\item \alert{Limitations:} Go methods don't backtrack.  Some reasonable
+functionality is still to be implemented.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile,label=sec-3-9]{Extending}
+ \begin{itemize}
+\item Example: \texttt{term.Native} type
+\item \texttt{golog.RegisterForeign} to create machines with special set of
+predicates
+\item \texttt{golog.Machine} is an \emph{interface!} Possible other implementations
+include:
+\begin{itemize}
+\item Relational database access
+\item Distributed machines
+\item Concurrent machines
+\end{itemize}
+\end{itemize}
+\end{frame}
+% Emacs 25.2.1 (Org mode 8.2.10)
+\end{document}
