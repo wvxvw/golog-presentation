@@ -206,7 +206,7 @@
 ** Slightly Advanced Rules
    #+BEGIN_SRC prolog
      not_tests(Sources) :-
-         findall(Source, (
+         findall(CFile, (
                      glob("./*.c", CFiles),
                      member(CFile, CFiles),
                      \+ prefix(CFile, "test_")
@@ -215,6 +215,7 @@
 
      all :-
          not_tests(Sources),
+         printf('Building %s~n', Sources),
          c(Sources, "program").
    #+END_SRC
 
