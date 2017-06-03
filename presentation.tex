@@ -1,4 +1,4 @@
-% Created 2017-05-01 Mon 18:23
+% Created 2017-06-03 Sat 11:08
 \documentclass[presentation]{beamer}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -33,9 +33,9 @@
 \end{frame}
 
 
-\section{But Why?}
+\section{Water, From The Toilet?}
 \label{sec-1}
-\includegraphics[height=8cm]{./images/butwhy.jpeg}
+\includegraphics[height=8cm]{./images/water-from-toilet.jpg}
 
 \begin{frame}[label=sec-1-1]{Serialization}
 \begin{quote}
@@ -87,11 +87,7 @@ Bart De Smet, C\# 5.0.
 \end{itemize}
 \end{frame}
 
-\section{Water, From The Toilet?}
-\label{sec-2}
-\includegraphics[height=8cm]{./images/water-from-toilet.jpg}
-
-\begin{frame}[label=sec-2-1]{Various models of computation, unknown to general public}
+\begin{frame}[label=sec-1-6]{Various models of computation, unknown to general public}
 \begin{itemize}
 \item Petri nets a.k.a. Turing machine
 \item ``Value semantics'', a.k.a. ``functional programming''
@@ -103,7 +99,7 @@ a.k.a. ``declarative programming''
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label=sec-2-2]{Programming taught using one model}
+\begin{frame}[label=sec-1-7]{Programming taught using one model}
 \begin{itemize}
 \item Model intuitively accepted as the only possible one
 \item Students don't develop more abstract understanding of computation
@@ -112,7 +108,7 @@ model
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile,label=sec-2-3]{Unification}
+\begin{frame}[fragile,label=sec-1-8]{Unification}
  \begin{verbatim}
 %% Two uninstantiated variables unify
 X = Y,
@@ -123,13 +119,27 @@ X = Y,
 %% and unify multiple variables
 %% X = 1, Y = 2, Z = baz(3)
 foo([bar(X, Y), Z]) = foo([bar(1, 2), baz(3)]),
-%% Unification can be recursive
+%% Unification can be selfreferential
 %% X = rec(rec(rec(...)))
 X = rec(X)
 \end{verbatim}
 \end{frame}
 
-\section{Seriously, Now}
+\section{Suggested literature}
+\label{sec-2}
+\begin{figure}[htb]
+\centering
+\includegraphics[height=6cm]{./images/the-art-of-prolog.jpg}
+\caption{\url{https://mitpress.mit.edu/books/art-prolog}}
+\end{figure}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[height=6cm]{./images/from-logic-to-logic-programming.jpg}
+\caption{\url{https://mitpress.mit.edu/books/logic-logic-programming}}
+\end{figure}
+
+\section{Gentle Introduction}
 \label{sec-3}
 \includegraphics[height=6cm]{./images/serious.jpg}
 
@@ -233,6 +243,56 @@ include:
 \item Distributed machines
 \item Concurrent machines
 \end{itemize}
+\end{itemize}
+\end{frame}
+
+\section{Writing A Build System Using Golog}
+\label{sec-4}
+
+\begin{frame}[label=sec-4-1]{Sources}
+\begin{itemize}
+\item Example project: \url{https://github.com/wvxvw/logomake}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile,label=sec-4-2]{Writing Rules}
+ \begin{verbatim}
+hello_world :-
+    c(["hello_world.c"], "hello_world").
+
+all :-
+    hello_world.
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile,label=sec-4-3]{Slightly Advanced Rules}
+ \begin{verbatim}
+not_tests(Sources) :-
+    findall(Source, (
+                glob("./*.c", CFiles),
+                member(CFile, CFiles),
+                \+ prefix(CFile, "test_")
+            ),
+            Sources).
+
+all :-
+    not_tests(Sources),
+    c(Sources, "program").
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile,label=sec-4-4]{Calling From Command Line}
+ \begin{verbatim}
+logomake [--makefile <file>] \
+         [--goal <prolog term>]
+\end{verbatim}
+
+\begin{itemize}
+\item Default file is \texttt{Makefile.logomake}.
+\item Default goal is \texttt{all.}.
+\item Allows evaluating arbtirary Prolog goal against the database in
+the Makefile.
+\item With a slight change, can run interactively.
 \end{itemize}
 \end{frame}
 % Emacs 25.2.1 (Org mode 8.2.10)

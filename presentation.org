@@ -18,9 +18,9 @@
 #+BEAMER_THEME: metropolis
 #+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
 
-* But Why?
+* Water, From The Toilet?
   #+attr_LaTeX: :height 8cm
-  [[./images/butwhy.jpeg]]
+  [[./images/water-from-toilet.jpg]]
 
 ** Serialization
    #+BEGIN_QUOTE
@@ -65,10 +65,6 @@
    + Rich data exchange and configuration format
    + Testing
 
-* Water, From The Toilet?
-  #+attr_LaTeX: :height 8cm
-  [[./images/water-from-toilet.jpg]]
-
 ** Various models of computation, unknown to general public
     + Petri nets a.k.a. Turing machine
     + ``Value semantics'', a.k.a. ``functional programming''
@@ -95,12 +91,21 @@
      %% and unify multiple variables
      %% X = 1, Y = 2, Z = baz(3)
      foo([bar(X, Y), Z]) = foo([bar(1, 2), baz(3)]),
-     %% Unification can be recursive
+     %% Unification can be selfreferential
      %% X = rec(rec(rec(...)))
      X = rec(X)
    #+END_SRC
 
-* Seriously, Now
+* Suggested literature
+  #+attr_LaTeX: :height 6cm
+  #+CAPTION: https://mitpress.mit.edu/books/art-prolog
+  [[./images/the-art-of-prolog.jpg]]
+
+  #+attr_LaTeX: :height 6cm
+  #+CAPTION: https://mitpress.mit.edu/books/logic-logic-programming
+  [[./images/from-logic-to-logic-programming.jpg]]
+
+* Gentle Introduction
   #+attr_LaTeX: :height 6cm
   [[./images/serious.jpg]]
 
@@ -183,3 +188,44 @@
      - Relational database access
      - Distributed machines
      - Concurrent machines
+
+* Writing A Build System Using Golog
+
+** Sources
+  + Example project: https://github.com/wvxvw/logomake
+
+** Writing Rules
+   #+BEGIN_SRC prolog
+     hello_world :-
+         c(["hello_world.c"], "hello_world").
+
+     all :-
+         hello_world.
+   #+END_SRC
+
+** Slightly Advanced Rules
+   #+BEGIN_SRC prolog
+     not_tests(Sources) :-
+         findall(Source, (
+                     glob("./*.c", CFiles),
+                     member(CFile, CFiles),
+                     \+ prefix(CFile, "test_")
+                 ),
+                 Sources).
+
+     all :-
+         not_tests(Sources),
+         c(Sources, "program").
+   #+END_SRC
+
+** Calling From Command Line
+   #+BEGIN_SRC sh
+     logomake [--makefile <file>] \
+              [--goal <prolog term>]
+   #+END_SRC
+
+   + Default file is =Makefile.logomake=.
+   + Default goal is =all.=.
+   + Allows evaluating arbtirary Prolog goal against the database in
+     the Makefile.
+   + With a slight change, can run interactively.
