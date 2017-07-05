@@ -22,6 +22,21 @@
   #+attr_LaTeX: :height 8cm
   [[./images/water-from-toilet.jpg]]
 
+** Various models of computation, unknown to general public
+    + Petri nets a.k.a. Turing machine
+    + ``Value semantics'', a.k.a. ``functional programming''
+      a.k.a. ``declarative programming''
+    + Unification
+    + Graph rewriting
+    + Cellular automata
+    + Biological modes? Perhaps much, much more...
+      
+** Programming taught using one model
+   + Model intuitively accepted as the only possible one
+   + Students don't develop more abstract understanding of computation
+   + Some problems lend themselvs better to particular computation
+     model
+
 ** Serialization
    #+BEGIN_QUOTE
    This comes up when you're doing generic programming, where you
@@ -57,28 +72,11 @@
    #+END_QUOTE
    Bart De Smet, C# 5.0.
    
-** Larger problem: dealing with the unknown
-   
 ** Some practical uses
    + Knowledge bases
    + Interactive shells
    + Rich data exchange and configuration format
    + Testing
-
-** Various models of computation, unknown to general public
-    + Petri nets a.k.a. Turing machine
-    + ``Value semantics'', a.k.a. ``functional programming''
-      a.k.a. ``declarative programming''
-    + Unification
-    + Graph rewriting
-    + Cellular automata
-    + Biological modes? Perhaps much, much more...
-      
-** Programming taught using one model
-   + Model intuitively accepted as the only possible one
-   + Students don't develop more abstract understanding of computation
-   + Some problems lend themselvs better to particular computation
-     model
 
 ** Unification
    #+BEGIN_SRC prolog
